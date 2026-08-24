@@ -40,6 +40,9 @@ create policy "quizz_sessions_owner_insert" on quizz_sessions
 create policy "quizz_sessions_owner_update" on quizz_sessions
   for update using (auth.uid() = created_by);
 
+create policy "quizz_sessions_owner_delete" on quizz_sessions
+  for delete using (auth.uid() = created_by);
+
 -- Responses: anyone (including anonymous participants) can insert a vote.
 -- Only the session's owner can read the raw responses.
 create policy "quizz_responses_anon_insert" on quizz_responses
