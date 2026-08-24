@@ -53,6 +53,16 @@ export function HostNewSession() {
     setSubmitting(false);
   }
 
+  if (setIds.length === 0) {
+    return (
+      <div className="plai-section">
+        <div className="plai-empty" style={{ maxWidth: '480px', margin: '0 auto' }}>
+          Aucun jeu de questions disponible. Ajoutez-en un dans <code>src/question-sets/</code> avant de créer une session.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="plai-section">
       <form className="plai-card" onSubmit={handleSubmit} style={{ maxWidth: '480px', margin: '0 auto' }}>
@@ -98,7 +108,7 @@ export function HostNewSession() {
 
         {error && <p className="plai-error">{error}</p>}
 
-        <button className="plai-btn" type="submit" disabled={submitting || setIds.length === 0}>
+        <button className="plai-btn" type="submit" disabled={submitting}>
           {submitting ? 'Création…' : 'Créer la session'}
         </button>
       </form>
