@@ -12,17 +12,18 @@ const questionSets = {
 };
 
 describe('buildQuestionAnalysisRows', () => {
-  it('counts correct and incorrect votes per question', () => {
+  it('counts correct and incorrect votes per école + question', () => {
     const rows = buildQuestionAnalysisRows(
       [
-        { question_set_id: 'demo', question_index: 0, choice: 0 }, // correct
-        { question_set_id: 'demo', question_index: 0, choice: 1 }, // wrong
-        { question_set_id: 'demo', question_index: 0, choice: 0 }, // correct
+        { ecole: 'Chaudfontaine', question_set_id: 'demo', question_index: 0, choice: 0 }, // correct
+        { ecole: 'Chaudfontaine', question_set_id: 'demo', question_index: 0, choice: 1 }, // wrong
+        { ecole: 'Chaudfontaine', question_set_id: 'demo', question_index: 0, choice: 0 }, // correct
       ],
       questionSets
     );
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
+      ecole: 'Chaudfontaine',
       jeu: 'Le pôle peut-il intervenir ?',
       question: 'Question A',
       total: 3,
@@ -32,17 +33,38 @@ describe('buildQuestionAnalysisRows', () => {
     });
   });
 
-  it('sorts worst-first (lowest % de bonnes réponses)', () => {
+  it('groups the same question separately per école', () => {
     const rows = buildQuestionAnalysisRows(
       [
-        // Question A: 100% correct
-        { question_set_id: 'demo', question_index: 0, choice: 0 },
-        // Question B: 0% correct
-        { question_set_id: 'demo', question_index: 1, choice: 0 },
+        { ecole: 'Chaudfontaine', question_set_id: 'demo', question_index: 0, choice: 0 }, // correct
+        { ecole: 'Perron', question_set_id: 'demo', question_index: 0, choice: 1 }, // wrong
       ],
       questionSets
     );
-    expect(rows.map((r) => r.question)).toEqual(['Question B', 'Question A']);
+    expect(rows).toHaveLength(2);
+    const chaudfontaine = rows.find((r) => r.ecole === 'Chaudfontaine');
+    const perron = rows.find((r) => r.ecole === 'Perron');
+    expect(chaudfontaine.pctCorrect).toBe(100);
+    expect(perron.pctCorrect).toBe(0);
+  });
+
+  it('sorts by école (alphabétique) then worst-first within each école', () => {
+    const rows = buildQuestionAnalysisRows(
+      [
+        // Perron, Question A: 100% correct
+        { ecole: 'Perron', question_set_id: 'demo', question_index: 0, choice: 0 },
+        // Perron, Question B: 0% correct
+        { ecole: 'Perron', question_set_id: 'demo', question_index: 1, choice: 0 },
+        // Chaudfontaine, Question A: 100% correct
+        { ecole: 'Chaudfontaine', question_set_id: 'demo', question_index: 0, choice: 0 },
+      ],
+      questionSets
+    );
+    expect(rows.map((r) => `${r.ecole}/${r.question}`)).toEqual([
+      'Chaudfontaine/Question A',
+      'Perron/Question B',
+      'Perron/Question A',
+    ]);
   });
 
   it('groups separately per question_set_id even if question_index collides', () => {
@@ -52,8 +74,8 @@ describe('buildQuestionAnalysisRows', () => {
     };
     const rows = buildQuestionAnalysisRows(
       [
-        { question_set_id: 'demo', question_index: 0, choice: 0 },
-        { question_set_id: 'other', question_index: 0, choice: 1 },
+        { ecole: 'Perron', question_set_id: 'demo', question_index: 0, choice: 0 },
+        { ecole: 'Perron', question_set_id: 'other', question_index: 0, choice: 1 },
       ],
       twoSets
     );
@@ -66,7 +88,7 @@ describe('buildQuestionAnalysisRows', () => {
 
   it('falls back gracefully when a question set or question is missing', () => {
     const rows = buildQuestionAnalysisRows(
-      [{ question_set_id: 'unknown-set', question_index: 0, choice: 0 }],
+      [{ ecole: 'Perron', question_set_id: 'unknown-set', question_index: 0, choice: 0 }],
       questionSets
     );
     expect(rows).toHaveLength(1);

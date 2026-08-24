@@ -13,6 +13,7 @@ export async function downloadQuestionAnalysisXlsx(rows, filename = 'quizzplai-a
   const sheet = workbook.addWorksheet('Par question');
 
   sheet.columns = [
+    { header: 'École', key: 'ecole', width: 24 },
     { header: 'Jeu de questions', key: 'jeu', width: 30 },
     { header: 'Question', key: 'question', width: 60 },
     { header: 'Réponses totales', key: 'total', width: 16 },

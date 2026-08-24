@@ -18,7 +18,7 @@ export function HostReport() {
     setExportError(null);
     const { data, error: fetchError } = await supabase
       .from('quizz_responses')
-      .select('question_index, choice, quizz_sessions(question_set_id)');
+      .select('question_index, choice, quizz_sessions(nom, question_set_id)');
 
     if (fetchError) {
       setExportError('Impossible de générer le fichier .xlsx. Réessayez.');
@@ -27,6 +27,7 @@ export function HostReport() {
     }
 
     const rows = (data ?? []).map((r) => ({
+      ecole: r.quizz_sessions?.nom ?? '(école inconnue)',
       question_set_id: r.quizz_sessions?.question_set_id,
       question_index: r.question_index,
       choice: r.choice,
@@ -62,7 +63,8 @@ export function HostReport() {
       <p className="no-print" style={{ fontSize: '0.85rem' }}>
         École, date, statut, QR code de la session et nombre de réponses collectées. Utilisez « Imprimer »
         pour obtenir une version papier ou PDF (via l'aperçu d'impression du navigateur), ou « Exporter en .xlsx »
-        pour repérer les questions qui posent le plus de difficultés (agrégé sur toutes vos sessions).
+        pour repérer les questions qui posent le plus de difficultés, détaillé par école, sur l'ensemble des
+        sessions que vous avez réalisées (pas seulement les plus récentes).
       </p>
 
       <style>{'@media print { .no-print { display: none; } }'}</style>
