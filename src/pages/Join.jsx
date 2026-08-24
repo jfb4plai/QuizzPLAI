@@ -54,6 +54,8 @@ export function Join() {
 function JoinedSession({ sessionId }) {
   const { session, loading } = useSessionRealtime(sessionId);
   const [voted, setVoted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [voteError, setVoteError] = useState(null);
 
   useEffect(() => {
     if (!session) return;
@@ -73,13 +75,22 @@ function JoinedSession({ sessionId }) {
   const currentQuestion = questionSet.questions[session.current_question_index];
 
   async function handleVote(choice) {
-    await supabase.from('quizz_responses').insert({
+    if (submitting) return;
+    setSubmitting(true);
+    setVoteError(null);
+    const { error } = await supabase.from('quizz_responses').insert({
       session_id: session.id,
       question_index: session.current_question_index,
       choice,
     });
+    if (error) {
+      setVoteError('Vote non enregistré. Réessayez.');
+      setSubmitting(false);
+      return;
+    }
     sessionStorage.setItem(votedKey(session.id, session.current_question_index), '1');
     setVoted(true);
+    setSubmitting(false);
   }
 
   return (
@@ -92,7 +103,10 @@ function JoinedSession({ sessionId }) {
       {voted ? (
         <p className="plai-success">Réponse enregistrée — en attente de la suite.</p>
       ) : (
-        <AnswerButtons options={questionSet.reponses_possibles} onVote={handleVote} disabled={false} />
+        <>
+          <AnswerButtons options={questionSet.reponses_possibles} onVote={handleVote} disabled={submitting} />
+          {voteError && <p className="plai-error">{voteError}</p>}
+        </>
       )}
     </div>
   );
