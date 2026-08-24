@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useSessionRealtime } from '../hooks/useSessionRealtime';
@@ -10,6 +11,7 @@ import { ResultBars } from '../components/ResultBars';
 export function HostSession() {
   const { id } = useParams();
   const { session, loading, error } = useSessionRealtime(id);
+  const [actionError, setActionError] = useState(null);
 
   if (loading) return <div className="plai-section">Chargement…</div>;
   if (error || !session) return <div className="plai-section plai-error">Session introuvable.</div>;
@@ -18,30 +20,48 @@ export function HostSession() {
   const joinUrl = `${window.location.origin}/join/${session.code}`;
 
   async function startSession() {
-    await supabase
+    setActionError(null);
+    const { error } = await supabase
       .from('quizz_sessions')
       .update({ current_question_index: 0, statut: 'en_cours' })
       .eq('id', session.id);
+    if (error) setActionError('Action impossible. Réessayez.');
   }
 
   async function reveal() {
-    await supabase.from('quizz_sessions').update({ revealed: true }).eq('id', session.id);
+    setActionError(null);
+    const { error } = await supabase
+      .from('quizz_sessions')
+      .update({ revealed: true })
+      .eq('id', session.id);
+    if (error) setActionError('Action impossible. Réessayez.');
   }
 
   async function nextQuestion() {
+    setActionError(null);
     const nextIndex = session.current_question_index + 1;
     if (nextIndex >= questionSet.questions.length) {
-      await supabase.from('quizz_sessions').update({ statut: 'terminee' }).eq('id', session.id);
+      const { error } = await supabase
+        .from('quizz_sessions')
+        .update({ statut: 'terminee' })
+        .eq('id', session.id);
+      if (error) setActionError('Action impossible. Réessayez.');
     } else {
-      await supabase
+      const { error } = await supabase
         .from('quizz_sessions')
         .update({ current_question_index: nextIndex, revealed: false })
         .eq('id', session.id);
+      if (error) setActionError('Action impossible. Réessayez.');
     }
   }
 
   async function endSession() {
-    await supabase.from('quizz_sessions').update({ statut: 'terminee' }).eq('id', session.id);
+    setActionError(null);
+    const { error } = await supabase
+      .from('quizz_sessions')
+      .update({ statut: 'terminee' })
+      .eq('id', session.id);
+    if (error) setActionError('Action impossible. Réessayez.');
   }
 
   if (session.statut === 'en_attente') {
@@ -50,6 +70,7 @@ export function HostSession() {
         <h1>{session.nom}</h1>
         <QRCodeBlock url={joinUrl} />
         <p>Code de session : <strong>{session.code}</strong></p>
+        {actionError && <p className="plai-error">{actionError}</p>}
         <button className="plai-btn" type="button" onClick={startSession}>
           Démarrer la session
         </button>
@@ -79,6 +100,8 @@ export function HostSession() {
       {session.revealed && <p className="plai-card">{currentQuestion.explication}</p>}
 
       {isLive && (
+        <>
+        {actionError && <p className="plai-error">{actionError}</p>}
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           {!session.revealed && (
             <button className="plai-btn" type="button" onClick={reveal}>
@@ -92,6 +115,7 @@ export function HostSession() {
             Terminer la session
           </button>
         </div>
+        </>
       )}
     </div>
   );
