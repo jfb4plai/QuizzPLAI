@@ -79,6 +79,7 @@ export function HostNewSession() {
           onChange={(e) => setDateSession(e.target.value)}
           required
         />
+        <p style={{ fontSize: '0.85rem' }}>Date réelle de la présentation en classe : sert à trier et identifier cette session dans l'historique du tableau de bord.</p>
 
         <label htmlFor="questionSet">Jeu de questions</label>
         <select
