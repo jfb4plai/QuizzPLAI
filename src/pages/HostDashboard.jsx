@@ -47,34 +47,60 @@ export function HostDashboard() {
     };
   }, [authSession.user.id]);
 
+  // Sessions arrivent déjà triées par date décroissante : en regroupant par
+  // ordre de première rencontre, chaque groupe (= école, via le champ "nom")
+  // se retrouve naturellement trié par session la plus récente.
+  const groups = [];
+  if (sessions) {
+    const byNom = new Map();
+    for (const s of sessions) {
+      if (!byNom.has(s.nom)) {
+        const group = { nom: s.nom, items: [] };
+        byNom.set(s.nom, group);
+        groups.push(group);
+      }
+      byNom.get(s.nom).items.push(s);
+    }
+  }
+
   return (
     <div className="plai-section">
       <h1>Mes sessions</h1>
-      <Link className="plai-btn" to="/host/new">
-        Nouvelle session
-      </Link>
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <Link className="plai-btn" to="/host/new">
+          Nouvelle session
+        </Link>
+        <Link className="plai-btn" to="/host/report">
+          Rapport imprimable
+        </Link>
+      </div>
 
       {error && <p className="plai-error">{error}</p>}
       {!error && sessions === null && <p>Chargement…</p>}
       {!error && sessions?.length === 0 && <p className="plai-empty">Aucune session pour l'instant.</p>}
 
-      {!error && sessions?.map((s) => (
-        <div
-          key={s.id}
-          className="plai-card"
-          style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}
-        >
-          <Link to={`/host/session/${s.id}`} style={{ flex: 1 }}>
-            <strong>{s.nom}</strong> — {s.date_session} — {s.statut}
-          </Link>
-          <button
-            type="button"
-            className="plai-btn"
-            onClick={() => handleDelete(s.id, s.nom)}
-            disabled={deletingId === s.id}
-          >
-            {deletingId === s.id ? 'Suppression…' : 'Supprimer'}
-          </button>
+      {!error && groups.map((group) => (
+        <div key={group.nom} style={{ marginTop: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.1rem' }}>{group.nom}</h2>
+          {group.items.map((s) => (
+            <div
+              key={s.id}
+              className="plai-card"
+              style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}
+            >
+              <Link to={`/host/session/${s.id}`} style={{ flex: 1 }}>
+                {s.date_session} — {s.statut}
+              </Link>
+              <button
+                type="button"
+                className="plai-btn"
+                onClick={() => handleDelete(s.id, s.nom)}
+                disabled={deletingId === s.id}
+              >
+                {deletingId === s.id ? 'Suppression…' : 'Supprimer'}
+              </button>
+            </div>
+          ))}
         </div>
       ))}
     </div>

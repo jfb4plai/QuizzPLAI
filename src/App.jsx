@@ -6,6 +6,7 @@ import { Login } from './pages/Login';
 import { HostNewSession } from './pages/HostNewSession';
 import { HostSession } from './pages/HostSession';
 import { HostDashboard } from './pages/HostDashboard';
+import { HostReport } from './pages/HostReport';
 import { Join } from './pages/Join';
 
 function ProtectedRoute({ children }) {
@@ -43,6 +44,14 @@ export function App() {
           element={
             <ProtectedRoute>
               <HostSession />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/host/report"
+          element={
+            <ProtectedRoute>
+              <HostReport />
             </ProtectedRoute>
           }
         />

@@ -67,7 +67,7 @@ export function HostSession() {
   if (session.statut === 'en_attente') {
     return (
       <div className="plai-section">
-        <h1>{session.nom}</h1>
+        <h1 style={{ textAlign: 'center' }}>{session.nom}</h1>
         <QRCodeBlock url={joinUrl} />
         <p>Code de session : <strong>{session.code}</strong></p>
         {actionError && <p className="plai-error">{actionError}</p>}
