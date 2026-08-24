@@ -9,6 +9,9 @@ export function validateQuestionSet(set) {
     if (!q.situation || typeof q.situation !== 'string') {
       throw new Error(`question ${i} : situation manquante ou invalide (set "${set.id}")`);
     }
+    if (!q.explication || typeof q.explication !== 'string') {
+      throw new Error(`question ${i} : explication manquante ou invalide (set "${set.id}")`);
+    }
     if (
       typeof q.bonne_reponse !== 'number' ||
       q.bonne_reponse < 0 ||
@@ -26,6 +29,22 @@ function fileNameToKey(path) {
   return path.split('/').pop();
 }
 
+export function buildQuestionSetIndex(entries) {
+  const sets = {};
+  for (const { registryEntry, rawSet } of entries) {
+    if (registryEntry.id !== rawSet.id) {
+      throw new Error(
+        `Incohérence d'id : le registre déclare "${registryEntry.id}" mais le fichier ${registryEntry.fichier ?? ''} contient l'id "${rawSet.id}"`
+      );
+    }
+    if (Object.prototype.hasOwnProperty.call(sets, registryEntry.id)) {
+      throw new Error(`Id de jeu de questions dupliqué dans le registre : "${registryEntry.id}"`);
+    }
+    sets[registryEntry.id] = validateQuestionSet(rawSet);
+  }
+  return sets;
+}
+
 export function loadQuestionSets() {
   const byFile = {};
   for (const [path, mod] of Object.entries(modules)) {
@@ -33,15 +52,15 @@ export function loadQuestionSets() {
   }
 
   const registry = byFile['index.json'];
-  const sets = {};
-  for (const entry of registry) {
-    const raw = byFile[entry.fichier];
+  const entries = registry.map((registryEntry) => {
+    const raw = byFile[registryEntry.fichier];
     if (!raw) {
-      throw new Error(`Jeu de questions introuvable pour l'entrée de registre "${entry.id}" (fichier ${entry.fichier})`);
+      throw new Error(`Jeu de questions introuvable pour l'entrée de registre "${registryEntry.id}" (fichier ${registryEntry.fichier})`);
     }
-    sets[entry.id] = validateQuestionSet(raw);
-  }
-  return sets;
+    return { registryEntry, rawSet: raw };
+  });
+
+  return buildQuestionSetIndex(entries);
 }
 
 export function getQuestionSet(id) {

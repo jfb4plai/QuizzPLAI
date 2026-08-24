@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateQuestionSet, loadQuestionSets, getQuestionSet } from './questionSets';
+import { validateQuestionSet, loadQuestionSets, getQuestionSet, buildQuestionSetIndex } from './questionSets';
 
 const validSet = {
   id: 'demo',
@@ -34,6 +34,53 @@ describe('validateQuestionSet', () => {
   it('rejects a question missing a situation', () => {
     const bad = { ...validSet, questions: [{ bonne_reponse: 0, explication: 'Y' }] };
     expect(() => validateQuestionSet(bad)).toThrow(/situation/);
+  });
+
+  it('rejects a question missing an explication', () => {
+    const bad = { ...validSet, questions: [{ situation: 'X', bonne_reponse: 0 }] };
+    expect(() => validateQuestionSet(bad)).toThrow(/explication/);
+  });
+
+  it('rejects a question with a non-string explication', () => {
+    const bad = {
+      ...validSet,
+      questions: [{ situation: 'X', bonne_reponse: 0, explication: 42 }],
+    };
+    expect(() => validateQuestionSet(bad)).toThrow(/explication/);
+  });
+
+  it('rejects a question with an empty explication', () => {
+    const bad = {
+      ...validSet,
+      questions: [{ situation: 'X', bonne_reponse: 0, explication: '' }],
+    };
+    expect(() => validateQuestionSet(bad)).toThrow(/explication/);
+  });
+});
+
+describe('buildQuestionSetIndex', () => {
+  it('builds a map keyed by registry id for well-formed entries', () => {
+    const entries = [
+      { registryEntry: { id: 'demo', fichier: 'demo.json' }, rawSet: validSet },
+    ];
+    const sets = buildQuestionSetIndex(entries);
+    expect(sets.demo).toBeDefined();
+    expect(sets.demo.questions).toHaveLength(1);
+  });
+
+  it('throws a clear error when two registry entries share the same id', () => {
+    const entries = [
+      { registryEntry: { id: 'demo', fichier: 'demo.json' }, rawSet: validSet },
+      { registryEntry: { id: 'demo', fichier: 'demo2.json' }, rawSet: { ...validSet } },
+    ];
+    expect(() => buildQuestionSetIndex(entries)).toThrow(/demo/);
+  });
+
+  it('throws when the registry id does not match the raw set\'s internal id', () => {
+    const entries = [
+      { registryEntry: { id: 'demo', fichier: 'demo.json' }, rawSet: { ...validSet, id: 'other' } },
+    ];
+    expect(() => buildQuestionSetIndex(entries)).toThrow(/demo/);
   });
 });
 
