@@ -1,0 +1,52 @@
+{
+  "id": "plai-missions-chaudfontaine",
+  "titre": "Le pôle peut-il intervenir ? Si oui, comment ?",
+  "reponses_possibles": ["Oui", "Non", "Oui, à certaines conditions"],
+  "questions": [
+    {
+      "situation": "Nous sommes en début d'année : je découvre une classe composée d'élèves à profils variés et je souhaiterais bénéficier d'un regard extérieur sur mes pratiques.",
+      "bonne_reponse": 0,
+      "explication": "Soutien à l'équipe. Attention : objectif pratiques inclusives et mise en place d'AU."
+    },
+    {
+      "situation": "Un enfant de ma classe a été bilanté par un neuropsychologue : les parents fournissent le bilan et demandent que les aménagements proposés par le spécialiste soient mis en place.",
+      "bonne_reponse": 0,
+      "explication": "Accompagnement à la mise en place d'un PAR. Attention : observation et réflexion préalable en vue de sélectionner les AR pertinents + réunion pour formaliser le PAR."
+    },
+    {
+      "situation": "J'ai un élève dans ma classe qui rencontre des difficultés, il est perdu dès qu'on mélange les types d'exercices. Un bilan logopédique a été réalisé, un protocole d'aménagements raisonnables a été formalisé mais l'élève ne semble pas progresser. Les parents n'ont pas demandé de revoir le protocole.",
+      "bonne_reponse": 0,
+      "explication": "Mission individuelle ou soutien aux équipes selon le contexte."
+    },
+    {
+      "situation": "Un enfant présente des difficultés scolaires importantes mais aucun spécialiste n'a été consulté. Le CPMS a été recommandé à la famille.",
+      "bonne_reponse": 0,
+      "explication": "Accompagnement à la mise en place d'un PAR SI autorisation parentale et diagnostic fonctionnel CPMS (demandé par la famille ET donné à la famille), OU soutien à l'enseignante sans intervention en classe."
+    },
+    {
+      "situation": "Avec mes collègues nous aimerions changer de méthode de lecture, les avis sont partagés entre plusieurs manuels disponibles.",
+      "bonne_reponse": 0,
+      "explication": "Soutien à l'équipe : participer à une concertation en apportant des éléments en lien avec les AU et le développement de l'enfant. Le pôle ne peut jamais conseiller un manuel en particulier."
+    },
+    {
+      "situation": "J'ai dans ma classe de 6e plusieurs élèves à besoins spécifiques pour qui un accompagnement individuel durant les épreuves du CEB serait opportun.",
+      "bonne_reponse": 0,
+      "explication": "Accompagnement d'élèves sous PAR. Attention : aménagements mis en place pendant l'année, de préférence formalisés dans un PAR."
+    },
+    {
+      "situation": "J'ai dans ma classe de maternelles un(e) élève au comportement violent.",
+      "bonne_reponse": 0,
+      "explication": "Soutien à l'enseignant + accompagnement d'élève si diagnostic et en collaboration avec le CPMS. Cellule maternelle."
+    },
+    {
+      "situation": "Je suis institutrice, je suis aux urgences avec mon enfant. Il était prévu que l'agent du Pôle accompagne ce matin deux élèves dans ma classe. Je le préviens avant 8h15 de mon absence et lui dis qu'il peut rester avec mes élèves le temps que j'arrive.",
+      "bonne_reponse": 1,
+      "explication": "Pas d'accompagnement en classe sans enseignant présent."
+    },
+    {
+      "situation": "Un parent d'un élève de ma classe a contacté l'agent du PLAI pour demander que des aménagements soient mis en place pour son enfant.",
+      "bonne_reponse": 1,
+      "explication": "Pas d'intervention sans demande de l'école."
+    }
+  ]
+}
