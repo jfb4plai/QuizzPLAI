@@ -43,10 +43,12 @@ export function Login() {
           id="password"
           className="plai-input"
           type="password"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <p style={{ fontSize: '0.85rem' }}>Votre mot de passe de compte PLAI, partagé par les applications du pôle.</p>
 
         {error && <p className="plai-error">{error}</p>}
 
