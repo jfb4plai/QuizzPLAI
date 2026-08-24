@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { generateSessionCode } from '../lib/sessionCode';
 import { loadQuestionSets } from '../lib/questionSets';
+import { buildSessionOrder } from '../lib/shuffle';
 
 const MAX_ATTEMPTS = 5;
 
@@ -24,6 +25,8 @@ export function HostNewSession() {
     setError(null);
     setSubmitting(true);
 
+    const { questionOrder, answerOrder } = buildSessionOrder(questionSets[questionSetId]);
+
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const code = generateSessionCode();
       const { data, error: insertError } = await supabase
@@ -33,6 +36,8 @@ export function HostNewSession() {
           nom,
           date_session: dateSession,
           question_set_id: questionSetId,
+          question_order: questionOrder,
+          answer_order: answerOrder,
           created_by: authSession.user.id,
         })
         .select()
@@ -104,7 +109,10 @@ export function HostNewSession() {
             </option>
           ))}
         </select>
-        <p style={{ fontSize: '0.85rem' }}>Détermine les questions et les 3 réponses proposées durant toute la session.</p>
+        <p style={{ fontSize: '0.85rem' }}>
+          Détermine les questions et les 3 réponses proposées. L'ordre des questions et des réponses est tiré au
+          hasard à chaque nouvelle session, pour éviter que les participants retiennent des repères de position.
+        </p>
 
         {error && <p className="plai-error">{error}</p>}
 

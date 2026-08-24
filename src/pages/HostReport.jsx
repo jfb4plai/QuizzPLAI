@@ -2,11 +2,39 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { QRCodeBlock } from '../components/QRCodeBlock';
+import { loadQuestionSets } from '../lib/questionSets';
+import { buildQuestionAnalysisRows } from '../lib/questionAnalysis';
+import { downloadQuestionAnalysisXlsx } from '../lib/exportXlsx';
 
 export function HostReport() {
   const { session: authSession } = useAuth();
   const [sessions, setSessions] = useState(null);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(null);
+
+  async function handleExportXlsx() {
+    setExporting(true);
+    setExportError(null);
+    const { data, error: fetchError } = await supabase
+      .from('quizz_responses')
+      .select('question_index, choice, quizz_sessions(question_set_id)');
+
+    if (fetchError) {
+      setExportError('Impossible de générer le fichier .xlsx. Réessayez.');
+      setExporting(false);
+      return;
+    }
+
+    const rows = (data ?? []).map((r) => ({
+      question_set_id: r.quizz_sessions?.question_set_id,
+      question_index: r.question_index,
+      choice: r.choice,
+    }));
+    const analysis = buildQuestionAnalysisRows(rows, loadQuestionSets());
+    await downloadQuestionAnalysisXlsx(analysis);
+    setExporting(false);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -33,10 +61,22 @@ export function HostReport() {
       <h1>Rapport des sessions</h1>
       <p className="no-print" style={{ fontSize: '0.85rem' }}>
         École, date, statut, QR code de la session et nombre de réponses collectées. Utilisez « Imprimer »
-        pour obtenir une version papier ou PDF (via l'aperçu d'impression du navigateur).
+        pour obtenir une version papier ou PDF (via l'aperçu d'impression du navigateur), ou « Exporter en .xlsx »
+        pour repérer les questions qui posent le plus de difficultés (agrégé sur toutes vos sessions).
       </p>
 
       <style>{'@media print { .no-print { display: none; } }'}</style>
+
+      <button
+        className="plai-btn no-print"
+        type="button"
+        onClick={handleExportXlsx}
+        disabled={exporting}
+        style={{ marginBottom: '0.5rem' }}
+      >
+        {exporting ? 'Génération…' : 'Exporter en .xlsx (analyse par question)'}
+      </button>
+      {exportError && <p className="plai-error no-print">{exportError}</p>}
 
       {error && <p className="plai-error">{error}</p>}
       {!error && sessions === null && <p>Chargement…</p>}

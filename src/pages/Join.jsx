@@ -72,23 +72,35 @@ function JoinedSession({ sessionId }) {
   }
 
   const questionSet = getQuestionSet(session.question_set_id);
-  const currentQuestion = questionSet.questions[session.current_question_index];
 
-  async function handleVote(choice) {
+  // Sessions créées avant l'ajout du mélange aléatoire n'ont pas ces colonnes :
+  // on retombe sur l'ordre naturel (identité) pour rester compatible.
+  const questionOrder =
+    session.question_order ?? questionSet.questions.map((_, i) => i);
+  const answerOrder =
+    session.answer_order ?? questionOrder.map(() => questionSet.reponses_possibles.map((_, i) => i));
+
+  const displayIndex = session.current_question_index;
+  const origQuestionIndex = questionOrder[displayIndex];
+  const currentQuestion = questionSet.questions[origQuestionIndex];
+  const optionOrder = answerOrder[displayIndex];
+  const displayOptions = optionOrder.map((origOptIdx) => questionSet.reponses_possibles[origOptIdx]);
+
+  async function handleVote(displayChoice) {
     if (submitting) return;
     setSubmitting(true);
     setVoteError(null);
     const { error } = await supabase.from('quizz_responses').insert({
       session_id: session.id,
-      question_index: session.current_question_index,
-      choice,
+      question_index: origQuestionIndex,
+      choice: optionOrder[displayChoice],
     });
     if (error) {
       setVoteError('Vote non enregistré. Réessayez.');
       setSubmitting(false);
       return;
     }
-    sessionStorage.setItem(votedKey(session.id, session.current_question_index), '1');
+    sessionStorage.setItem(votedKey(session.id, displayIndex), '1');
     setVoted(true);
     setSubmitting(false);
   }
@@ -96,7 +108,7 @@ function JoinedSession({ sessionId }) {
   return (
     <div className="plai-section">
       <QuestionDisplay
-        questionIndex={session.current_question_index}
+        questionIndex={displayIndex}
         totalQuestions={questionSet.questions.length}
         situation={currentQuestion.situation}
       />
@@ -104,7 +116,7 @@ function JoinedSession({ sessionId }) {
         <p className="plai-success">Réponse enregistrée — en attente de la suite.</p>
       ) : (
         <>
-          <AnswerButtons options={questionSet.reponses_possibles} onVote={handleVote} disabled={submitting} />
+          <AnswerButtons options={displayOptions} onVote={handleVote} disabled={submitting} />
           {voteError && <p className="plai-error">{voteError}</p>}
         </>
       )}

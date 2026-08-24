@@ -19,6 +19,13 @@ export function HostSession() {
   const questionSet = getQuestionSet(session.question_set_id);
   const joinUrl = `${window.location.origin}/join/${session.code}`;
 
+  // Sessions créées avant l'ajout du mélange aléatoire n'ont pas ces colonnes :
+  // on retombe sur l'ordre naturel (identité) pour rester compatible.
+  const questionOrder =
+    session.question_order ?? questionSet.questions.map((_, i) => i);
+  const answerOrder =
+    session.answer_order ?? questionOrder.map(() => questionSet.reponses_possibles.map((_, i) => i));
+
   async function startSession() {
     setActionError(null);
     const { error } = await supabase
@@ -78,24 +85,30 @@ export function HostSession() {
     );
   }
 
-  const currentQuestion = questionSet.questions[session.current_question_index];
+  const displayIndex = session.current_question_index;
+  const origQuestionIndex = questionOrder[displayIndex];
+  const currentQuestion = questionSet.questions[origQuestionIndex];
+  const optionOrder = answerOrder[displayIndex];
+  const displayOptions = optionOrder.map((origOptIdx) => questionSet.reponses_possibles[origOptIdx]);
+  const correctDisplayIndex = optionOrder.indexOf(currentQuestion.bonne_reponse);
   const isLive = session.statut === 'en_cours';
 
   return (
     <div className="plai-section">
-      <h1>{session.nom}</h1>
+      <h1 style={{ textAlign: 'center' }}>{session.nom}</h1>
       {isLive && <QRCodeBlock url={joinUrl} />}
       <QuestionDisplay
-        questionIndex={session.current_question_index}
+        questionIndex={displayIndex}
         totalQuestions={questionSet.questions.length}
         situation={currentQuestion.situation}
       />
       <LiveResults
         sessionId={session.id}
-        questionIndex={session.current_question_index}
-        options={questionSet.reponses_possibles}
+        origQuestionIndex={origQuestionIndex}
+        optionOrder={optionOrder}
+        options={displayOptions}
         revealed={session.revealed}
-        correctIndex={currentQuestion.bonne_reponse}
+        correctIndex={correctDisplayIndex}
       />
       {session.revealed && <p className="plai-card">{currentQuestion.explication}</p>}
 
@@ -121,7 +134,7 @@ export function HostSession() {
   );
 }
 
-function LiveResults({ sessionId, questionIndex, options, revealed, correctIndex }) {
-  const counts = useResponseCounts(sessionId, questionIndex, options.length);
+function LiveResults({ sessionId, origQuestionIndex, optionOrder, options, revealed, correctIndex }) {
+  const counts = useResponseCounts(sessionId, origQuestionIndex, optionOrder);
   return <ResultBars options={options} counts={counts} revealed={revealed} correctIndex={correctIndex} />;
 }

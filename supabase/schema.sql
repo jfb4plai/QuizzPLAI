@@ -8,6 +8,13 @@ create table if not exists quizz_sessions (
   nom text not null,
   date_session date not null default current_date,
   question_set_id text not null,
+  -- Ordre d'affichage tiré au hasard à la création de la session (voir src/lib/shuffle.js) :
+  -- question_order[i] = index original de la question affichée en position i ;
+  -- answer_order[i] = permutation des index originaux des 3 réponses pour cette position.
+  -- Les réponses (quizz_responses) sont toujours enregistrées avec les index ORIGINAUX,
+  -- pas les positions affichées, pour rester comparables entre sessions mélangées différemment.
+  question_order jsonb,
+  answer_order jsonb,
   current_question_index int not null default -1,
   revealed boolean not null default false,
   statut text not null default 'en_attente' check (statut in ('en_attente', 'en_cours', 'terminee')),
