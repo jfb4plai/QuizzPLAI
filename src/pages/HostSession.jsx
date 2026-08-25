@@ -62,6 +62,25 @@ export function HostSession() {
     }
   }
 
+  async function previousQuestion() {
+    setActionError(null);
+    if (session.current_question_index <= 0) return;
+    const { error } = await supabase
+      .from('quizz_sessions')
+      .update({ current_question_index: session.current_question_index - 1, revealed: false })
+      .eq('id', session.id);
+    if (error) setActionError('Action impossible. Réessayez.');
+  }
+
+  async function restartFromBeginning() {
+    setActionError(null);
+    const { error } = await supabase
+      .from('quizz_sessions')
+      .update({ current_question_index: 0, revealed: false })
+      .eq('id', session.id);
+    if (error) setActionError('Action impossible. Réessayez.');
+  }
+
   async function endSession() {
     setActionError(null);
     const { error } = await supabase
@@ -116,7 +135,23 @@ export function HostSession() {
       {isLive && (
         <>
         {actionError && <p className="plai-error">{actionError}</p>}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button
+            className="plai-btn"
+            type="button"
+            onClick={restartFromBeginning}
+            disabled={displayIndex === 0}
+          >
+            Recommencer depuis le début
+          </button>
+          <button
+            className="plai-btn"
+            type="button"
+            onClick={previousQuestion}
+            disabled={displayIndex === 0}
+          >
+            Question précédente
+          </button>
           {!session.revealed && (
             <button className="plai-btn" type="button" onClick={reveal}>
               Révéler la réponse
