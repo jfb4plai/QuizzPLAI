@@ -108,6 +108,7 @@ function JoinedSession({ sessionId }) {
   return (
     <div className="plai-section">
       <QuestionDisplay
+        titre={questionSet.titre}
         questionIndex={displayIndex}
         totalQuestions={questionSet.questions.length}
         situation={currentQuestion.situation}

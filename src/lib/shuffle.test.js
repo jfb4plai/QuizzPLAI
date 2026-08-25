@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { shuffle, buildSessionOrder } from './shuffle';
+import { getQuestionSet } from './questionSets';
 
 describe('shuffle', () => {
   it('preserves all elements (same multiset), just reordered', () => {
@@ -59,5 +60,43 @@ describe('buildSessionOrder', () => {
     for (const order of answerOrder) {
       expect([...order].sort()).toEqual([0, 1, 2]);
     }
+  });
+});
+
+describe('shuffle invariant: the revealed correct answer always belongs to the displayed question', () => {
+  // Reproduces exactly the derivation used in HostSession.jsx / Join.jsx:
+  // origQuestionIndex = questionOrder[displayIndex]; correctDisplayIndex =
+  // answerOrder[displayIndex].indexOf(questions[origQuestionIndex].bonne_reponse).
+  // This is the concrete concern raised after adding randomization: does the
+  // correct answer revealed for "Question N" ever get associated with the WRONG
+  // question's content (e.g. by display position instead of by the question's
+  // own data)? Run across many random session orders to make sure it never does.
+  const realSet = getQuestionSet('plai-missions-chaudfontaine');
+
+  it('never mismatches, across 200 random session orders', () => {
+    for (let trial = 0; trial < 200; trial++) {
+      const { questionOrder, answerOrder } = buildSessionOrder(realSet);
+
+      for (let displayIndex = 0; displayIndex < questionOrder.length; displayIndex++) {
+        const origQuestionIndex = questionOrder[displayIndex];
+        const question = realSet.questions[origQuestionIndex];
+        const optionOrder = answerOrder[displayIndex];
+
+        const displayOptions = optionOrder.map((origOptIdx) => realSet.reponses_possibles[origOptIdx]);
+        const correctDisplayIndex = optionOrder.indexOf(question.bonne_reponse);
+        const revealedText = displayOptions[correctDisplayIndex];
+
+        // The revealed text must always equal THIS question's own correct
+        // answer text — never another question's, and never shifted by
+        // whatever position it happens to be shown at.
+        expect(revealedText).toBe(realSet.reponses_possibles[question.bonne_reponse]);
+      }
+    }
+  });
+
+  it('confirms the known content: the "classe de maternelles" question (situation) is "Oui" — not "Oui, à certaines conditions"', () => {
+    const maternelles = realSet.questions.find((q) => q.situation.includes('maternelles'));
+    expect(maternelles).toBeDefined();
+    expect(realSet.reponses_possibles[maternelles.bonne_reponse]).toBe('Oui');
   });
 });

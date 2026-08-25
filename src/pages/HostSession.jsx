@@ -98,6 +98,7 @@ export function HostSession() {
       <h1 style={{ textAlign: 'center' }}>{session.nom}</h1>
       {isLive && <QRCodeBlock url={joinUrl} />}
       <QuestionDisplay
+        titre={questionSet.titre}
         questionIndex={displayIndex}
         totalQuestions={questionSet.questions.length}
         situation={currentQuestion.situation}
