@@ -39,6 +39,7 @@ export function HostNewSession() {
           question_order: questionOrder,
           answer_order: answerOrder,
           created_by: authSession.user.id,
+          created_by_email: authSession.user.email,
         })
         .select()
         .single();

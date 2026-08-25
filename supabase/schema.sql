@@ -19,8 +19,22 @@ create table if not exists quizz_sessions (
   revealed boolean not null default false,
   statut text not null default 'en_attente' check (statut in ('en_attente', 'en_cours', 'terminee')),
   created_by uuid not null references auth.users(id),
+  -- Dénormalisé à la création (voir HostNewSession.jsx) pour afficher qui a créé
+  -- la session dans le tableau de bord admin sans devoir lire auth.users côté client.
+  created_by_email text,
   created_at timestamptz not null default now()
 );
+
+-- Liste des comptes admin QuizzPLAI (vue consolidée toutes sessions/tous agents).
+-- Ne modifie pas `profiles` (table partagée par toutes les apps PLAI) : rôle propre à cette app.
+create table if not exists quizz_admins (
+  user_id uuid primary key references auth.users(id)
+);
+
+alter table quizz_admins enable row level security;
+
+create policy "quizz_admins_self_read" on quizz_admins
+  for select using (auth.uid() = user_id);
 
 create table if not exists quizz_responses (
   id uuid primary key default gen_random_uuid(),
@@ -51,16 +65,19 @@ create policy "quizz_sessions_owner_delete" on quizz_sessions
   for delete using (auth.uid() = created_by);
 
 -- Responses: anyone (including anonymous participants) can insert a vote.
--- Only the session's owner can read the raw responses.
+-- The session's owner, or a QuizzPLAI admin, can read the raw responses.
 create policy "quizz_responses_anon_insert" on quizz_responses
   for insert with check (true);
 
-create policy "quizz_responses_owner_read" on quizz_responses
+create policy "quizz_responses_owner_or_admin_read" on quizz_responses
   for select using (
     exists (
       select 1 from quizz_sessions s
       where s.id = quizz_responses.session_id
       and s.created_by = auth.uid()
+    )
+    or exists (
+      select 1 from quizz_admins a where a.user_id = auth.uid()
     )
   );
 

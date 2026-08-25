@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
+import { useIsAdmin } from '../hooks/useIsAdmin';
 import { QRCodeBlock } from '../components/QRCodeBlock';
 import { loadQuestionSets } from '../lib/questionSets';
 import { buildQuestionAnalysisRows } from '../lib/questionAnalysis';
@@ -8,6 +9,7 @@ import { downloadQuestionAnalysisXlsx } from '../lib/exportXlsx';
 
 export function HostReport() {
   const { session: authSession } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin(authSession.user.id);
   const [sessions, setSessions] = useState(null);
   const [error, setError] = useState(null);
   const [exporting, setExporting] = useState(false);
@@ -38,33 +40,37 @@ export function HostReport() {
   }
 
   useEffect(() => {
+    if (adminLoading) return;
     let cancelled = false;
-    supabase
+    let query = supabase
       .from('quizz_sessions')
       .select('*, quizz_responses(count)')
-      .eq('created_by', authSession.user.id)
-      .order('date_session', { ascending: false })
-      .then(({ data, error: fetchError }) => {
-        if (cancelled) return;
-        if (fetchError) {
-          setError('Impossible de charger le rapport. Réessayez.');
-          return;
-        }
-        setSessions(data ?? []);
-      });
+      .order('date_session', { ascending: false });
+    if (!isAdmin) {
+      query = query.eq('created_by', authSession.user.id);
+    }
+    query.then(({ data, error: fetchError }) => {
+      if (cancelled) return;
+      if (fetchError) {
+        setError('Impossible de charger le rapport. Réessayez.');
+        return;
+      }
+      setSessions(data ?? []);
+    });
     return () => {
       cancelled = true;
     };
-  }, [authSession.user.id]);
+  }, [authSession.user.id, isAdmin, adminLoading]);
 
   return (
     <div className="plai-section">
-      <h1>Rapport des sessions</h1>
+      <h1>{isAdmin ? 'Rapport consolidé (toutes les sessions, tous les agents)' : 'Rapport des sessions'}</h1>
       <p className="no-print" style={{ fontSize: '0.85rem' }}>
         École, date, statut, QR code de la session et nombre de réponses collectées. Utilisez « Imprimer »
         pour obtenir une version papier ou PDF (via l'aperçu d'impression du navigateur), ou « Exporter en .xlsx »
         pour repérer les questions qui posent le plus de difficultés, détaillé par école, sur l'ensemble des
-        sessions que vous avez réalisées (pas seulement les plus récentes).
+        sessions {isAdmin ? 'de tous les agents du pôle' : 'que vous avez réalisées'} (pas seulement les plus
+        récentes).
       </p>
 
       <style>{'@media print { .no-print { display: none; } }'}</style>
@@ -95,6 +101,9 @@ export function HostReport() {
               <tr>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '0.5rem' }}>École</th>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '0.5rem' }}>Date</th>
+                {isAdmin && (
+                  <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '0.5rem' }}>Agent</th>
+                )}
                 <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '0.5rem' }}>Statut</th>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '0.5rem' }}>QR code</th>
                 <th style={{ textAlign: 'left', borderBottom: '1px solid var(--border)', padding: '0.5rem' }}>Réponses</th>
@@ -105,6 +114,11 @@ export function HostReport() {
                 <tr key={s.id}>
                   <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border)' }}>{s.nom}</td>
                   <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border)' }}>{s.date_session}</td>
+                  {isAdmin && (
+                    <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border)' }}>
+                      {s.created_by_email ?? '—'}
+                    </td>
+                  )}
                   <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border)' }}>{s.statut}</td>
                   <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border)' }}>
                     <QRCodeBlock url={`${window.location.origin}/join/${s.code}`} size={96} compact />
