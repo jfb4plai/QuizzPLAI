@@ -35,7 +35,19 @@ export function ResultBars({ options, counts, revealed, correctIndex }) {
               <span>
                 {isCorrect && <span aria-hidden="true">✓ </span>}
                 <strong>{LABELS[i]}.</strong> {option}
-                {isCorrect && <span className="plai-success"> — bonne réponse</span>}
+                {isCorrect && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      width: '1px',
+                      height: '1px',
+                      overflow: 'hidden',
+                      clip: 'rect(0,0,0,0)',
+                    }}
+                  >
+                    {' '}— bonne réponse
+                  </span>
+                )}
               </span>
               <span>{counts[i]} ({pct}%)</span>
             </div>
