@@ -130,7 +130,9 @@ export function HostSession() {
         revealed={session.revealed}
         correctIndex={correctDisplayIndex}
       />
-      {session.revealed && <p className="plai-card">{currentQuestion.explication}</p>}
+      {session.revealed && currentQuestion.explication && (
+        <p className="plai-card">{currentQuestion.explication}</p>
+      )}
 
       {isLive && (
         <>

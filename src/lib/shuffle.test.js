@@ -94,9 +94,9 @@ describe('shuffle invariant: the revealed correct answer always belongs to the d
     }
   });
 
-  it('confirms the known content: the "classe de maternelles" question (situation) is "Oui" — not "Oui, à certaines conditions"', () => {
+  it('confirms the known content: the "classe de maternelles" question is "Oui, à certaines conditions" (verified via python-docx, 2026-08-25 — corrects an earlier fabricated-content bug)', () => {
     const maternelles = realSet.questions.find((q) => q.situation.includes('maternelles'));
     expect(maternelles).toBeDefined();
-    expect(realSet.reponses_possibles[maternelles.bonne_reponse]).toBe('Oui');
+    expect(realSet.reponses_possibles[maternelles.bonne_reponse]).toBe('Oui, à certaines conditions');
   });
 });

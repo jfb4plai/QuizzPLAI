@@ -36,23 +36,15 @@ describe('validateQuestionSet', () => {
     expect(() => validateQuestionSet(bad)).toThrow(/situation/);
   });
 
-  it('rejects a question missing an explication', () => {
-    const bad = { ...validSet, questions: [{ situation: 'X', bonne_reponse: 0 }] };
-    expect(() => validateQuestionSet(bad)).toThrow(/explication/);
+  it('accepts a question with no explication (optional field)', () => {
+    const ok = { ...validSet, questions: [{ situation: 'X', bonne_reponse: 0 }] };
+    expect(() => validateQuestionSet(ok)).not.toThrow();
   });
 
   it('rejects a question with a non-string explication', () => {
     const bad = {
       ...validSet,
       questions: [{ situation: 'X', bonne_reponse: 0, explication: 42 }],
-    };
-    expect(() => validateQuestionSet(bad)).toThrow(/explication/);
-  });
-
-  it('rejects a question with an empty explication', () => {
-    const bad = {
-      ...validSet,
-      questions: [{ situation: 'X', bonne_reponse: 0, explication: '' }],
     };
     expect(() => validateQuestionSet(bad)).toThrow(/explication/);
   });
@@ -98,5 +90,12 @@ describe('loadQuestionSets / getQuestionSet', () => {
 
   it('getQuestionSet throws for an unknown id', () => {
     expect(() => getQuestionSet('does-not-exist')).toThrow(/does-not-exist/);
+  });
+
+  it('Chaudfontaine set: matches the source docx exactly (verified via python-docx, 2026-08-25)', () => {
+    const set = getQuestionSet('plai-missions-chaudfontaine');
+    // index -> expected bonne_reponse (0=Oui, 1=Non, 2=Oui, à certaines conditions)
+    const expected = [0, 0, 0, 2, 2, 2, 2, 1, 1];
+    expect(set.questions.map((q) => q.bonne_reponse)).toEqual(expected);
   });
 });

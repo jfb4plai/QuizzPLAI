@@ -9,8 +9,8 @@ export function validateQuestionSet(set) {
     if (!q.situation || typeof q.situation !== 'string') {
       throw new Error(`question ${i} : situation manquante ou invalide (set "${set.id}")`);
     }
-    if (!q.explication || typeof q.explication !== 'string') {
-      throw new Error(`question ${i} : explication manquante ou invalide (set "${set.id}")`);
+    if (q.explication != null && typeof q.explication !== 'string') {
+      throw new Error(`question ${i} : explication invalide, doit être une chaîne si présente (set "${set.id}")`);
     }
     if (
       typeof q.bonne_reponse !== 'number' ||
