@@ -6,6 +6,7 @@ import { QRCodeBlock } from '../components/QRCodeBlock';
 import { loadQuestionSets } from '../lib/questionSets';
 import { buildQuestionAnalysisRows } from '../lib/questionAnalysis';
 import { downloadQuestionAnalysisXlsx } from '../lib/exportXlsx';
+import { friendlyFetchError } from '../lib/supabaseErrorMessage';
 
 export function HostReport() {
   const { session: authSession } = useAuth();
@@ -24,7 +25,7 @@ export function HostReport() {
 
     if (fetchError) {
       console.error('quizz_responses export fetch error', fetchError);
-      setExportError(`Impossible de générer le fichier .xlsx. ${fetchError.message ?? ''}`);
+      setExportError(friendlyFetchError(fetchError, 'Impossible de générer le fichier .xlsx.'));
       setExporting(false);
       return;
     }
@@ -54,7 +55,7 @@ export function HostReport() {
       if (cancelled) return;
       if (fetchError) {
         console.error('quizz_sessions report fetch error', fetchError);
-        setError(`Impossible de charger le rapport. ${fetchError.message ?? ''}`);
+        setError(friendlyFetchError(fetchError, 'Impossible de charger le rapport.'));
         return;
       }
       setSessions(data ?? []);

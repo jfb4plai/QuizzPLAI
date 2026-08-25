@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsAdmin } from '../hooks/useIsAdmin';
+import { friendlyFetchError } from '../lib/supabaseErrorMessage';
 
 export function HostDashboard() {
   const { session: authSession } = useAuth();
@@ -40,7 +41,7 @@ export function HostDashboard() {
       if (cancelled) return;
       if (fetchError) {
         console.error('quizz_sessions fetch error', fetchError);
-        setError(`Impossible de charger les sessions. ${fetchError.message ?? ''}`);
+        setError(friendlyFetchError(fetchError, 'Impossible de charger les sessions.'));
         return;
       }
       setSessions(data ?? []);
