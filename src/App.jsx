@@ -3,6 +3,9 @@ import { Nav } from './components/Nav';
 import { Footer } from './components/Footer';
 import { useAuth } from './contexts/AuthContext';
 import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 import { HostNewSession } from './pages/HostNewSession';
 import { HostSession } from './pages/HostSession';
 import { HostDashboard } from './pages/HostDashboard';
@@ -22,6 +25,9 @@ export function App() {
       <Nav />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/join/:code" element={<Join />} />
         <Route
           path="/host/dashboard"

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
 export function Login() {
@@ -55,6 +55,11 @@ export function Login() {
         <button className="plai-btn" type="submit" disabled={submitting}>
           {submitting ? 'Connexion…' : 'Se connecter'}
         </button>
+
+        <p style={{ marginTop: '1rem', fontSize: '0.9rem', display: 'flex', justifyContent: 'space-between' }}>
+          <Link to="/signup">Créer un compte</Link>
+          <Link to="/forgot-password">Mot de passe oublié ?</Link>
+        </p>
       </form>
     </div>
   );
