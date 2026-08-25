@@ -10,7 +10,9 @@ export function QRCodeBlock({ url, size = 240, compact = false }) {
     QRCode.toDataURL(url, {
       width: size,
       margin: 1,
-      color: { dark: '#0a9370', light: '#ffffff' },
+      // Noir sur blanc : meilleur contraste que le teal PLAI pour la lecture par
+      // les caméras de téléphone (fiabilité de scan avant cohérence de marque ici).
+      color: { dark: '#000000', light: '#ffffff' },
     }).then((data) => {
       if (!cancelled) setDataUrl(data);
     }).catch(() => {
