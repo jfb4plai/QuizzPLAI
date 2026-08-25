@@ -18,8 +18,11 @@ export function useIsAdmin(userId) {
       .select('user_id')
       .eq('user_id', userId)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
         if (cancelled) return;
+        if (error) {
+          console.error('quizz_admins check failed', error);
+        }
         setIsAdmin(!!data);
         setLoading(false);
       });

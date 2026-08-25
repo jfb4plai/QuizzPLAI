@@ -39,7 +39,8 @@ export function HostDashboard() {
     query.then(({ data, error: fetchError }) => {
       if (cancelled) return;
       if (fetchError) {
-        setError('Impossible de charger les sessions. Réessayez.');
+        console.error('quizz_sessions fetch error', fetchError);
+        setError(`Impossible de charger les sessions. ${fetchError.message ?? ''}`);
         return;
       }
       setSessions(data ?? []);

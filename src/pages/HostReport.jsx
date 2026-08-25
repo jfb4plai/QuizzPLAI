@@ -23,7 +23,8 @@ export function HostReport() {
       .select('question_index, choice, quizz_sessions(nom, question_set_id)');
 
     if (fetchError) {
-      setExportError('Impossible de générer le fichier .xlsx. Réessayez.');
+      console.error('quizz_responses export fetch error', fetchError);
+      setExportError(`Impossible de générer le fichier .xlsx. ${fetchError.message ?? ''}`);
       setExporting(false);
       return;
     }
@@ -52,7 +53,8 @@ export function HostReport() {
     query.then(({ data, error: fetchError }) => {
       if (cancelled) return;
       if (fetchError) {
-        setError('Impossible de charger le rapport. Réessayez.');
+        console.error('quizz_sessions report fetch error', fetchError);
+        setError(`Impossible de charger le rapport. ${fetchError.message ?? ''}`);
         return;
       }
       setSessions(data ?? []);
