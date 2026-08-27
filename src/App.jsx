@@ -10,7 +10,9 @@ import { HostNewSession } from './pages/HostNewSession';
 import { HostSession } from './pages/HostSession';
 import { HostDashboard } from './pages/HostDashboard';
 import { HostReport } from './pages/HostReport';
+import { HostStableLinks } from './pages/HostStableLinks';
 import { Join } from './pages/Join';
+import { JoinBySet } from './pages/JoinBySet';
 
 function ProtectedRoute({ children }) {
   const { session, loading } = useAuth();
@@ -29,6 +31,7 @@ export function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/join/:code" element={<Join />} />
+        <Route path="/join-set/:questionSetId" element={<JoinBySet />} />
         <Route
           path="/host/dashboard"
           element={
@@ -58,6 +61,14 @@ export function App() {
           element={
             <ProtectedRoute>
               <HostReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/host/stable-links"
+          element={
+            <ProtectedRoute>
+              <HostStableLinks />
             </ProtectedRoute>
           }
         />

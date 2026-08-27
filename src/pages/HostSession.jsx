@@ -17,7 +17,12 @@ export function HostSession() {
   if (error || !session) return <div className="plai-section plai-error">Session introuvable.</div>;
 
   const questionSet = getQuestionSet(session.question_set_id);
-  const joinUrl = `${window.location.origin}/join/${session.code}`;
+  // Un jeu de questions marqué "stableJoin" utilise un lien fixe, identique à
+  // chaque session (voir /join-set/:questionSetId) — utile pour un QR imprimé
+  // une fois et réutilisé à chaque formation, plutôt que le code par session.
+  const joinUrl = questionSet.stableJoin
+    ? `${window.location.origin}/join-set/${questionSet.id}`
+    : `${window.location.origin}/join/${session.code}`;
 
   // Sessions créées avant l'ajout du mélange aléatoire n'ont pas ces colonnes :
   // on retombe sur l'ordre naturel (identité) pour rester compatible.
@@ -95,7 +100,9 @@ export function HostSession() {
       <div className="plai-section">
         <h1 style={{ textAlign: 'center' }}>{session.nom}</h1>
         <QRCodeBlock url={joinUrl} />
-        <p>Code de session : <strong>{session.code}</strong></p>
+        {!questionSet.stableJoin && (
+          <p>Code de session : <strong>{session.code}</strong></p>
+        )}
         {actionError && <p className="plai-error">{actionError}</p>}
         <button className="plai-btn" type="button" onClick={startSession}>
           Démarrer la session

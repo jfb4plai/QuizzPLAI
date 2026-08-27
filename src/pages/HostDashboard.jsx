@@ -77,6 +77,9 @@ export function HostDashboard() {
         <Link className="plai-btn" to="/host/report">
           Rapport imprimable
         </Link>
+        <Link className="plai-btn" to="/host/stable-links">
+          Liens stables
+        </Link>
       </div>
 
       {error && <p className="plai-error">{error}</p>}
