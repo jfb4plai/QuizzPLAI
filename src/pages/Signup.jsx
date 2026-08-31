@@ -34,7 +34,9 @@ export function Signup() {
     }
 
     if (data.session) {
-      // Confirmation e-mail désactivée sur ce projet Supabase : compte actif immédiatement.
+      // Si la confirmation e-mail est désactivée sur ce projet Supabase à ce
+      // moment-là, le compte est actif immédiatement — sinon (cas normal
+      // actuellement), on passe par la branche confirmationSent ci-dessous.
       navigate('/host/dashboard');
       return;
     }
@@ -45,12 +47,17 @@ export function Signup() {
   if (confirmationSent) {
     return (
       <div className="plai-section">
-        <div className="plai-card" style={{ maxWidth: '400px', margin: '0 auto' }}>
-          <p className="plai-success">
-            Compte créé. Vérifiez votre boîte e-mail ({email}) et cliquez sur le lien de confirmation avant de vous
-            connecter.
+        <div className="plai-banner" style={{ maxWidth: '480px', margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '1.3rem' }}>Vérifiez votre boîte e-mail</h1>
+          <p style={{ fontSize: '1.1rem', marginTop: '0.5rem' }}>
+            Un e-mail de confirmation vient d'être envoyé à <strong>{email}</strong>. Cliquez sur le lien qu'il
+            contient pour activer votre compte — vous ne pourrez pas vous connecter avant ça.
           </p>
-          <Link className="plai-btn" to="/login" style={{ marginTop: '0.5rem', display: 'inline-block' }}>
+          <p style={{ fontSize: '0.85rem', marginTop: '0.75rem', color: 'var(--text2)' }}>
+            Pas reçu de mail ? Vérifiez vos courriers indésirables. L'objet peut ne pas mentionner QuizzPLAI —
+            c'est normal, ne l'ignorez pas.
+          </p>
+          <Link className="plai-btn" to="/login" style={{ marginTop: '1rem', display: 'inline-block' }}>
             Retour à la connexion
           </Link>
         </div>
