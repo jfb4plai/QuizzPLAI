@@ -61,8 +61,13 @@ create policy "quizz_sessions_owner_insert" on quizz_sessions
 create policy "quizz_sessions_owner_update" on quizz_sessions
   for update using (auth.uid() = created_by);
 
-create policy "quizz_sessions_owner_delete" on quizz_sessions
-  for delete using (auth.uid() = created_by);
+create policy "quizz_sessions_owner_or_admin_delete" on quizz_sessions
+  for delete using (
+    auth.uid() = created_by
+    or exists (
+      select 1 from quizz_admins a where a.user_id = auth.uid()
+    )
+  );
 
 -- Responses: anyone (including anonymous participants) can insert a vote.
 -- The session's owner, or a QuizzPLAI admin, can read the raw responses.

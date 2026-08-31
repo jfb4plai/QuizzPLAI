@@ -103,7 +103,7 @@ export function HostDashboard() {
                     <span style={{ color: 'var(--text3)' }}> — créé par {s.created_by_email}</span>
                   )}
                 </Link>
-                {isOwn && (
+                {(isOwn || isAdmin) && (
                   <button
                     type="button"
                     className="plai-btn"
