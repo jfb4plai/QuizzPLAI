@@ -1,0 +1,43 @@
+{
+  "id": "quizz-rentree-equipes-educatives-2026",
+  "titre": "Le pôle peut-il intervenir ?",
+  "reponses_possibles": ["Oui", "Non", "Oui, à certaines conditions"],
+  "questions": [
+    {
+      "situation": "Nous sommes en début d'année : je découvre une classe composée d'élèves à profils variés et je souhaiterais bénéficier d'un regard extérieur sur mes pratiques.",
+      "bonnes_reponses": [0, 2]
+    },
+    {
+      "situation": "Un élève de ma classe a été bilanté par un neuropsychologue : les parents fournissent le bilan à l'école et demandent que les aménagements proposés par le spécialiste soient mis en place.",
+      "bonnes_reponses": [0, 2]
+    },
+    {
+      "situation": "J'ai un élève dans ma classe qui rencontre des difficultés, il est perdu dès qu'on mélange les types d'exercices. Un bilan logopédique a été réalisé, un protocole d'aménagements raisonnables a été formalisé mais l'élève ne semble pas progresser.",
+      "bonnes_reponses": [0, 2]
+    },
+    {
+      "situation": "Un élève présente des difficultés scolaires importantes mais aucun spécialiste n'a été consulté. Le CPMS a été recommandé à la famille.",
+      "bonnes_reponses": [2]
+    },
+    {
+      "situation": "Avec mes collègues nous aimerions changer de méthode d'apprentissage d'une matière spécifique (exemples, lecture), les avis sont partagés entre plusieurs manuels disponibles.",
+      "bonnes_reponses": [0, 2]
+    },
+    {
+      "situation": "J'ai dans ma classe plusieurs élèves à besoins spécifiques pour lesquels un accompagnement individuel durant les épreuves externes serait opportun.",
+      "bonnes_reponses": [2]
+    },
+    {
+      "situation": "J'ai dans ma classe un(e) élève au comportement violent.",
+      "bonnes_reponses": [2]
+    },
+    {
+      "situation": "Je suis aux urgences avec mon enfant. Il était prévu que l'agent du Pôle accompagne ce matin deux élèves dans ma classe. Je le préviens avant 8h15 de mon absence et lui dis qu'il peut rester avec mes élèves le temps que j'arrive.",
+      "bonnes_reponses": [1]
+    },
+    {
+      "situation": "Un parent d'un élève de ma classe a contacté l'agent du PLAI pour demander que des aménagements soient mis en place pour son enfant.",
+      "bonnes_reponses": [1]
+    }
+  ]
+}

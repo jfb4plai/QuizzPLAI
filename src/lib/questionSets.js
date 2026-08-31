@@ -12,13 +12,19 @@ export function validateQuestionSet(set) {
     if (q.explication != null && typeof q.explication !== 'string') {
       throw new Error(`question ${i} : explication invalide, doit être une chaîne si présente (set "${set.id}")`);
     }
-    if (
-      typeof q.bonne_reponse !== 'number' ||
-      q.bonne_reponse < 0 ||
-      q.bonne_reponse >= set.reponses_possibles.length
-    ) {
-      throw new Error(`question ${i} : bonne_reponse hors limites (set "${set.id}")`);
+    if (!Array.isArray(q.bonnes_reponses) || q.bonnes_reponses.length === 0) {
+      throw new Error(`question ${i} : bonnes_reponses doit être une liste non vide (set "${set.id}")`);
     }
+    const seen = new Set();
+    q.bonnes_reponses.forEach((idx) => {
+      if (typeof idx !== 'number' || idx < 0 || idx >= set.reponses_possibles.length) {
+        throw new Error(`question ${i} : bonnes_reponses contient un index hors limites (set "${set.id}")`);
+      }
+      if (seen.has(idx)) {
+        throw new Error(`question ${i} : bonnes_reponses contient un doublon (set "${set.id}")`);
+      }
+      seen.add(idx);
+    });
   });
   return set;
 }

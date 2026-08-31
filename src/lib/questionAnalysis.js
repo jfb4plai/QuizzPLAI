@@ -27,7 +27,7 @@ export function buildQuestionAnalysisRows(responseRows, questionSets) {
     group.total += 1;
 
     const question = questionSets[r.question_set_id]?.questions?.[r.question_index];
-    if (question && r.choice === question.bonne_reponse) {
+    if (question?.bonnes_reponses?.includes(r.choice)) {
       group.correct += 1;
     }
   }

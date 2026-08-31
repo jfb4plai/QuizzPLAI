@@ -5,8 +5,8 @@ const questionSets = {
   demo: {
     titre: 'Le pôle peut-il intervenir ?',
     questions: [
-      { situation: 'Question A', bonne_reponse: 0 },
-      { situation: 'Question B', bonne_reponse: 1 },
+      { situation: 'Question A', bonnes_reponses: [0] },
+      { situation: 'Question B', bonnes_reponses: [1] },
     ],
   },
 };
@@ -70,7 +70,7 @@ describe('buildQuestionAnalysisRows', () => {
   it('groups separately per question_set_id even if question_index collides', () => {
     const twoSets = {
       ...questionSets,
-      other: { titre: 'Autre jeu', questions: [{ situation: 'Autre question 0', bonne_reponse: 0 }] },
+      other: { titre: 'Autre jeu', questions: [{ situation: 'Autre question 0', bonnes_reponses: [0] }] },
     };
     const rows = buildQuestionAnalysisRows(
       [
@@ -80,6 +80,24 @@ describe('buildQuestionAnalysisRows', () => {
       twoSets
     );
     expect(rows).toHaveLength(2);
+  });
+
+  it('counts a vote as correct if it matches ANY of a question\'s multiple correct answers', () => {
+    const multiAnswerSets = {
+      demo: {
+        titre: 'Titre',
+        questions: [{ situation: 'Question double', bonnes_reponses: [0, 2] }],
+      },
+    };
+    const rows = buildQuestionAnalysisRows(
+      [
+        { ecole: 'Perron', question_set_id: 'demo', question_index: 0, choice: 0 }, // correct
+        { ecole: 'Perron', question_set_id: 'demo', question_index: 0, choice: 2 }, // also correct
+        { ecole: 'Perron', question_set_id: 'demo', question_index: 0, choice: 1 }, // wrong
+      ],
+      multiAnswerSets
+    );
+    expect(rows[0]).toMatchObject({ total: 3, correct: 2, incorrect: 1 });
   });
 
   it('returns an empty array for no responses', () => {

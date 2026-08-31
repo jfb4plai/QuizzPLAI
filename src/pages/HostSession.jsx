@@ -116,7 +116,9 @@ export function HostSession() {
   const currentQuestion = questionSet.questions[origQuestionIndex];
   const optionOrder = answerOrder[displayIndex];
   const displayOptions = optionOrder.map((origOptIdx) => questionSet.reponses_possibles[origOptIdx]);
-  const correctDisplayIndex = optionOrder.indexOf(currentQuestion.bonne_reponse);
+  const correctDisplayIndices = optionOrder
+    .map((origOptIdx, displayPos) => (currentQuestion.bonnes_reponses.includes(origOptIdx) ? displayPos : -1))
+    .filter((pos) => pos !== -1);
   const isLive = session.statut === 'en_cours';
 
   return (
@@ -135,7 +137,7 @@ export function HostSession() {
         optionOrder={optionOrder}
         options={displayOptions}
         revealed={session.revealed}
-        correctIndex={correctDisplayIndex}
+        correctIndices={correctDisplayIndices}
       />
       {session.revealed && currentQuestion.explication && (
         <p className="plai-card">{currentQuestion.explication}</p>
@@ -179,7 +181,7 @@ export function HostSession() {
   );
 }
 
-function LiveResults({ sessionId, origQuestionIndex, optionOrder, options, revealed, correctIndex }) {
+function LiveResults({ sessionId, origQuestionIndex, optionOrder, options, revealed, correctIndices }) {
   const counts = useResponseCounts(sessionId, origQuestionIndex, optionOrder);
-  return <ResultBars options={options} counts={counts} revealed={revealed} correctIndex={correctIndex} />;
+  return <ResultBars options={options} counts={counts} revealed={revealed} correctIndices={correctIndices} />;
 }

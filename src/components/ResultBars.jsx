@@ -1,6 +1,6 @@
 const LABELS = ['A', 'B', 'C'];
 
-export function ResultBars({ options, counts, revealed, correctIndex }) {
+export function ResultBars({ options, counts, revealed, correctIndices }) {
   const total = counts.reduce((sum, c) => sum + c, 0);
 
   return (
@@ -15,8 +15,8 @@ export function ResultBars({ options, counts, revealed, correctIndex }) {
       `}</style>
       {options.map((option, i) => {
         const pct = total === 0 ? 0 : Math.round((counts[i] / total) * 100);
-        const isCorrect = revealed && correctIndex === i;
-        const isWrong = revealed && correctIndex !== i;
+        const isCorrect = revealed && correctIndices.includes(i);
+        const isWrong = revealed && !correctIndices.includes(i);
         return (
           <div
             key={i}
