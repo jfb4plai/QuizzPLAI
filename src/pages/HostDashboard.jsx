@@ -88,6 +88,9 @@ export function HostDashboard() {
         <Link className="plai-btn" to={`/host/new?set=${encodeURIComponent(questionSetId)}`}>
           Nouvelle session
         </Link>
+        <Link className="plai-btn" to={`/host/report?set=${encodeURIComponent(questionSetId)}`}>
+          Rapport imprimable
+        </Link>
       </div>
 
       {error && <p className="plai-error">{error}</p>}

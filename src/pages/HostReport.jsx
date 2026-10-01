@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsAdmin } from '../hooks/useIsAdmin';
@@ -10,6 +11,9 @@ import { friendlyFetchError } from '../lib/supabaseErrorMessage';
 
 export function HostReport() {
   const { session: authSession } = useAuth();
+  const [searchParams] = useSearchParams();
+  const questionSetId = searchParams.get('set');
+  const questionSet = questionSetId ? loadQuestionSets()[questionSetId] : null;
   const { isAdmin, loading: adminLoading } = useIsAdmin(authSession.user.id);
   const [sessions, setSessions] = useState(null);
   const [error, setError] = useState(null);
@@ -30,7 +34,9 @@ export function HostReport() {
       return;
     }
 
-    const rows = (data ?? []).map((r) => ({
+    const rows = (data ?? [])
+      .filter((r) => !questionSetId || r.quizz_sessions?.question_set_id === questionSetId)
+      .map((r) => ({
       ecole: r.quizz_sessions?.nom ?? '(école inconnue)',
       question_set_id: r.quizz_sessions?.question_set_id,
       question_index: r.question_index,
@@ -51,6 +57,9 @@ export function HostReport() {
     if (!isAdmin) {
       query = query.eq('created_by', authSession.user.id);
     }
+    if (questionSetId) {
+      query = query.eq('question_set_id', questionSetId);
+    }
     query.then(({ data, error: fetchError }) => {
       if (cancelled) return;
       if (fetchError) {
@@ -63,11 +72,17 @@ export function HostReport() {
     return () => {
       cancelled = true;
     };
-  }, [authSession.user.id, isAdmin, adminLoading]);
+  }, [authSession.user.id, isAdmin, adminLoading, questionSetId]);
 
   return (
     <div className="plai-section">
-      <h1>{isAdmin ? 'Rapport consolidé (toutes les sessions, tous les agents)' : 'Rapport des sessions'}</h1>
+      <p className="no-print">
+        <Link to={questionSet ? `/host/dashboard/${questionSetId}` : '/host/dashboard'}>← Retour</Link>
+      </p>
+      <h1>
+        {questionSet ? `${questionSet.nom ?? questionSet.titre} : ` : ''}
+        {isAdmin ? 'Rapport consolidé (toutes les sessions, tous les agents)' : 'Rapport des sessions'}
+      </h1>
       <p className="no-print" style={{ fontSize: '0.85rem' }}>
         École, date, statut, QR code de la session et nombre de réponses collectées. Utilisez « Imprimer »
         pour obtenir une version papier ou PDF (via l'aperçu d'impression du navigateur), ou « Exporter en .xlsx »

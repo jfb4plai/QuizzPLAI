@@ -18,10 +18,7 @@ export function HostHome() {
       ))}
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
         <Link className="plai-btn" to="/host/report">
-          Rapport imprimable
-        </Link>
-        <Link className="plai-btn" to="/host/stable-links">
-          Liens stables
+          Rapport (tous les quiz)
         </Link>
       </div>
     </div>
