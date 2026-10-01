@@ -128,3 +128,12 @@ describe('loadQuestionSets / getQuestionSet', () => {
     expect(set.questions.map((q) => q.bonnes_reponses)).toEqual(expected);
   });
 });
+
+describe('quizz écoles de l\'enseignement spécialisé', () => {
+  it('is registered with its own id, distinct name and 10 questions', () => {
+    const set = getQuestionSet('quizz-ecoles-enseignement-specialise-2026');
+    expect(set.nom).toBe("Quizz écoles de l'enseignement spécialisé");
+    expect(set.questions).toHaveLength(10);
+    expect(set.reponses_possibles).toEqual(getQuestionSet('quizz-rentree-equipes-educatives-2026').reponses_possibles);
+  });
+});

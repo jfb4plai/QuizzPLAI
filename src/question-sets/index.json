@@ -1,3 +1,10 @@
 [
-  { "id": "quizz-rentree-equipes-educatives-2026", "fichier": "quizz-rentree-equipes-educatives-2026.json" }
+  {
+    "id": "quizz-rentree-equipes-educatives-2026",
+    "fichier": "quizz-rentree-equipes-educatives-2026.json"
+  },
+  {
+    "id": "quizz-ecoles-enseignement-specialise-2026",
+    "fichier": "quizz-ecoles-enseignement-specialise-2026.json"
+  }
 ]

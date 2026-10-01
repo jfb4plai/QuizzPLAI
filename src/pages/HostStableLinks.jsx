@@ -27,7 +27,7 @@ export function HostStableLinks() {
         const url = `${window.location.origin}/join-set/${set.id}`;
         return (
           <div key={set.id} style={{ marginTop: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.1rem' }}>{set.titre}</h2>
+            <h2 style={{ fontSize: '1.1rem' }}>{set.nom ?? set.titre}</h2>
             <QRCodeBlock url={url} />
           </div>
         );

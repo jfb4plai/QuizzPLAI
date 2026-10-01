@@ -29,7 +29,7 @@ function JoinBySetInner({ questionSet }) {
     return (
       <div className="plai-section">
         <p className="plai-empty">
-          Aucune session « {questionSet.titre} » en cours pour le moment. Attendez que l'agent en démarre une —
+          Aucune session « {questionSet.nom ?? questionSet.titre} » en cours pour le moment. Attendez que l'agent en démarre une —
           cette page se met à jour automatiquement.
         </p>
       </div>

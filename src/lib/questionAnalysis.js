@@ -37,7 +37,7 @@ export function buildQuestionAnalysisRows(responseRows, questionSets) {
     const question = set?.questions?.[group.question_index];
     return {
       ecole: group.ecole,
-      jeu: set?.titre ?? group.question_set_id,
+      jeu: set?.nom ?? set?.titre ?? group.question_set_id,
       question: question?.situation ?? `Question ${group.question_index + 1}`,
       total: group.total,
       correct: group.correct,

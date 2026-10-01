@@ -106,7 +106,7 @@ export function HostNewSession() {
         >
           {setIds.map((id) => (
             <option key={id} value={id}>
-              {questionSets[id].titre}
+              {questionSets[id].nom ?? questionSets[id].titre}
             </option>
           ))}
         </select>
