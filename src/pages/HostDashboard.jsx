@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { useIsAdmin } from '../hooks/useIsAdmin';
 import { friendlyFetchError } from '../lib/supabaseErrorMessage';
+import { loadQuestionSets } from '../lib/questionSets';
 
 export function HostDashboard() {
+  const { questionSetId } = useParams();
+  const questionSet = loadQuestionSets()[questionSetId];
   const { session: authSession } = useAuth();
   const { isAdmin, loading: adminLoading } = useIsAdmin(authSession.user.id);
   const [sessions, setSessions] = useState(null);
@@ -33,7 +36,8 @@ export function HostDashboard() {
   useEffect(() => {
     if (adminLoading) return;
     let cancelled = false;
-    let query = supabase.from('quizz_sessions').select('*').order('date_session', { ascending: false });
+    let query = supabase.from('quizz_sessions').select('*').eq('question_set_id', questionSetId)
+      .order('date_session', { ascending: false });
     if (!isAdmin) {
       query = query.eq('created_by', authSession.user.id);
     }
@@ -49,7 +53,7 @@ export function HostDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [authSession.user.id, isAdmin, adminLoading]);
+  }, [authSession.user.id, isAdmin, adminLoading, questionSetId]);
 
   // Sessions arrivent déjà triées par date décroissante : en regroupant par
   // ordre de première rencontre, chaque groupe (= école, via le champ "nom")
@@ -67,18 +71,22 @@ export function HostDashboard() {
     }
   }
 
+  if (!questionSet) {
+    return (
+      <div className="plai-section">
+        <p className="plai-empty">Quiz inconnu. <Link to="/host/dashboard">Retour aux quiz</Link></p>
+      </div>
+    );
+  }
+
   return (
     <div className="plai-section">
-      <h1>{isAdmin ? 'Toutes les sessions (vue admin)' : 'Mes sessions'}</h1>
+      <p><Link to="/host/dashboard">← Tous les quiz</Link></p>
+      <h1>{questionSet.nom ?? questionSet.titre}</h1>
+      <p>{isAdmin ? 'Toutes les sessions (vue admin)' : 'Mes sessions'}</p>
       <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <Link className="plai-btn" to="/host/new">
+        <Link className="plai-btn" to={`/host/new?set=${encodeURIComponent(questionSetId)}`}>
           Nouvelle session
-        </Link>
-        <Link className="plai-btn" to="/host/report">
-          Rapport imprimable
-        </Link>
-        <Link className="plai-btn" to="/host/stable-links">
-          Liens stables
         </Link>
       </div>
 

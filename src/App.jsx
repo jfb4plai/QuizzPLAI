@@ -9,6 +9,7 @@ import { ResetPassword } from './pages/ResetPassword';
 import { HostNewSession } from './pages/HostNewSession';
 import { HostSession } from './pages/HostSession';
 import { HostDashboard } from './pages/HostDashboard';
+import { HostHome } from './pages/HostHome';
 import { HostReport } from './pages/HostReport';
 import { HostStableLinks } from './pages/HostStableLinks';
 import { Join } from './pages/Join';
@@ -34,6 +35,14 @@ export function App() {
         <Route path="/join-set/:questionSetId" element={<JoinBySet />} />
         <Route
           path="/host/dashboard"
+          element={
+            <ProtectedRoute>
+              <HostHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/host/dashboard/:questionSetId"
           element={
             <ProtectedRoute>
               <HostDashboard />

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { generateSessionCode } from '../lib/sessionCode';
@@ -11,11 +11,11 @@ const MAX_ATTEMPTS = 5;
 export function HostNewSession() {
   const { session: authSession } = useAuth();
   const questionSets = loadQuestionSets();
-  const setIds = Object.keys(questionSets);
+  const [searchParams] = useSearchParams();
+  const questionSetId = searchParams.get('set');
 
   const [nom, setNom] = useState('');
   const [dateSession, setDateSession] = useState(() => new Date().toISOString().slice(0, 10));
-  const [questionSetId, setQuestionSetId] = useState(setIds[0] ?? '');
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -59,14 +59,8 @@ export function HostNewSession() {
     setSubmitting(false);
   }
 
-  if (setIds.length === 0) {
-    return (
-      <div className="plai-section">
-        <div className="plai-empty" style={{ maxWidth: '480px', margin: '0 auto' }}>
-          Aucun jeu de questions disponible. Ajoutez-en un dans <code>src/question-sets/</code> avant de créer une session.
-        </div>
-      </div>
-    );
+  if (!questionSets[questionSetId]) {
+    return <Navigate to="/host/dashboard" replace />;
   }
 
   return (
@@ -97,22 +91,10 @@ export function HostNewSession() {
         />
         <p style={{ fontSize: '0.85rem' }}>Date réelle de la présentation en classe : sert à trier et identifier cette session dans l'historique du tableau de bord.</p>
 
-        <label htmlFor="questionSet">Jeu de questions</label>
-        <select
-          id="questionSet"
-          className="plai-input"
-          value={questionSetId}
-          onChange={(e) => setQuestionSetId(e.target.value)}
-        >
-          {setIds.map((id) => (
-            <option key={id} value={id}>
-              {questionSets[id].nom ?? questionSets[id].titre}
-            </option>
-          ))}
-        </select>
+        <p>Quiz : <strong>{questionSets[questionSetId].nom ?? questionSets[questionSetId].titre}</strong></p>
         <p style={{ fontSize: '0.85rem' }}>
-          Détermine les questions et les 3 réponses proposées. L'ordre des questions et des réponses est tiré au
-          hasard à chaque nouvelle session, pour éviter que les participants retiennent des repères de position.
+          L'ordre des questions et des réponses est tiré au hasard à chaque nouvelle session, pour éviter que les
+          participants retiennent des repères de position.
         </p>
 
         {error && <p className="plai-error">{error}</p>}
