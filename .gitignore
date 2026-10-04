@@ -2,3 +2,7 @@ node_modules/
 dist/
 .env
 .env.local
+
+# Dependances et secrets (ajoute 2026-10-04)
+.env.*
+!.env*.example
